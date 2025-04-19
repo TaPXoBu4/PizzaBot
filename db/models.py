@@ -1,40 +1,56 @@
-from abc import ABC, abstractmethod
-import sqlite3 as sq
+from datetime import datetime
+from typing import Annotated, List
+
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from enum import StrEnum
 
 
-
-class DataBase(ABC):
-    @abstractmethod
-    def select_query(self, query, params):
-        pass
-
-    @abstractmethod
-    def post_query(self, query, params):
-        pass
+class Roles(StrEnum):
+    ADMIN = "admin"
+    COURIER = "courier"
 
 
-class SqLiteDataBase(DataBase):
-    def __init__(self, name, create_script):
-        self.name = name
-        with sq.connect(self.name) as con:
-            con.executescript(create_script)
+class Base(DeclarativeBase):
+    pass
 
-    def select_query(self, query, params=None) -> list[dict]:
-        if params is None:
-            params = []
-        with sq.connect(self.name, detect_types=sq.PARSE_COLNAMES | sq.PARSE_DECLTYPES) as con:
-            con.row_factory = sq.Row
-            temp = con.execute(query, params).fetchall()
-            result = []
-            if temp:
-                for i in temp:
-                    item = dict(zip(i.keys(), tuple(i)))
-                    result.append(item)
-            return result
 
-    def post_query(self, query: str, params=None) -> None:
-        if params is None:
-            params = []
-        with sq.connect(self.name, detect_types=sq.PARSE_COLNAMES | sq.PARSE_DECLTYPES) as con:
-            con.execute(query, params)
-            con.commit()
+dttm = Annotated[datetime, mapped_column(default=datetime.now)]
+classic_id = Annotated[
+    int,
+    mapped_column(
+        primary_key=True,
+        autoincrement=True,
+        nullable=False,
+    ),
+]
+
+
+class User(Base):
+    __tablename__ = "users"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(unique=True)
+    role: Mapped[str]
+    orders: Mapped[List['Order']] = relationship(back_populates='courier')
+
+    def __repr__(self) -> str:
+        return f"User(id={self.id!r}, name={self.name!r}, role={self.role!r})"
+
+
+class Order(Base):
+    __tablename__ = "orders"
+
+    id: Mapped[classic_id]
+    location: 
+
+    def __repr__(self) -> str:
+        return f"Condition(id={self.condition_id!r}, zone={self.zone!r}, dttm={self.dttm!r}, condition={self.condition!r})"
+
+
+class Location(Base):
+    __tablename__ = "locations"
+
+    id: Mapped[classic_id]
+    name: Mapped[str] = mapped_column(unique=True)
+
+    def __repr__(self) -> str:
+        return f"Location(id={self.id!r}, name={self.name!r})"
