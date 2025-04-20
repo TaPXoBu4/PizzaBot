@@ -1,13 +1,9 @@
 from datetime import datetime
-from typing import Annotated, List
+from typing import Annotated, List, Optional, Text
 
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from enum import StrEnum
 
-
-class Roles(StrEnum):
-    ADMIN = "admin"
-    COURIER = "courier"
+from sqlalchemy.orm.properties import ForeignKey
 
 
 class Base(DeclarativeBase):
@@ -30,7 +26,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
     role: Mapped[str]
-    orders: Mapped[List['Order']] = relationship(back_populates='courier')
+    orders: Mapped[List["Order"]] = relationship(back_populates="courier")
 
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, name={self.name!r}, role={self.role!r})"
@@ -40,10 +36,16 @@ class Order(Base):
     __tablename__ = "orders"
 
     id: Mapped[classic_id]
-    location: 
+    dttm: Mapped[dttm]
+    payment: Mapped[str]
+    price: Mapped[Optional[int]]
+    courier_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"))
+    courier: Mapped["User"] = relationship(back_populates="orders")
+    location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("locations.id"))
+    info: Mapped[Optional[Text]]
 
     def __repr__(self) -> str:
-        return f"Condition(id={self.condition_id!r}, zone={self.zone!r}, dttm={self.dttm!r}, condition={self.condition!r})"
+        return f"Order(id={self.id!r}, dttm={self.dttm!r}, price={self.dttm!r}, payment={self.payment!r}, courier={self.courier.name!r})"
 
 
 class Location(Base):
