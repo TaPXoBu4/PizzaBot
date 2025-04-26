@@ -9,16 +9,14 @@ from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.types import ErrorEvent
 from aiogram_dialog import DialogManager, StartMode, setup_dialogs
 from aiogram_dialog.api.exceptions import OutdatedIntent, UnknownIntent
-
-# from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from redis.asyncio import Redis
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
 from config import StartStates, settings
 from db.models import User
 from middlewares import DbSessionMiddleware
-from routers import start_router
+from redis.asyncio import Redis
+from routers import router
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from admins import dialogs as admin_dialogs
 
 
 async def ui_error_handler(event: ErrorEvent, dialog_manager: DialogManager):
@@ -32,7 +30,7 @@ async def ui_error_handler(event: ErrorEvent, dialog_manager: DialogManager):
 
 async def main():
     logging.basicConfig(
-        level=logging.WARNING,
+        level=logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
     )
     engine = create_async_engine(settings.sqlite_async_dsn, echo=False)
@@ -42,15 +40,6 @@ async def main():
         token=settings.bot_token.get_secret_value(),
         default=DefaultBotProperties(parse_mode="HTML"),
     )
-    scheduler = AsyncIOScheduler()
-    scheduler.start()
-    scheduler.add_job(
-        poll_and_save,
-        trigger="interval",
-        seconds=15,
-        id="polling",
-        args=[db_pool, bot],
-    )
     storage = RedisStorage(
         Redis(),
         key_builder=DefaultKeyBuilder(
@@ -59,8 +48,8 @@ async def main():
         ),
     )
     dp = Dispatcher(storage=storage)
-    dp.include_routers(start_router, dialogs.main)
-    setup_dialogs(dp, media_id_storage=MediaIdStorage())
+    dp.include_routers(router, admin_dialogs.add_user)
+    setup_dialogs(dp)
     dp.update.outer_middleware(DbSessionMiddleware(db_pool))
     dp.errors.register(
         ui_error_handler,

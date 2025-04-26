@@ -8,14 +8,14 @@ from couriers.states import MainSG as courier_mainsg
 
 
 class Roles(StrEnum):
-    ADMIN = "admin"
-    COURIER = "courier"
+    ADMIN = "админ"
+    COURIER = "курьер"
 
 
 class Payments(StrEnum):
-    CASH = "cash"
-    TERMINAL = "terminal"
-    PAID = "paid"
+    CASH = "наличные"
+    TERMINAL = "терминал"
+    PAID = "оплачено"
 
 
 StartStates = {
