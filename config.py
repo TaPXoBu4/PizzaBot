@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     def sqlite_async_dsn(self):
         return f"sqlite+aiosqlite:///{self.db_name}"
 
+    @property
+    def sqlite_sync_dsn(self):
+        return f"sqlite:///{self.db_name}"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

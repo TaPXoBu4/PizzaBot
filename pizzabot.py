@@ -9,14 +9,18 @@ from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.types import ErrorEvent
 from aiogram_dialog import DialogManager, StartMode, setup_dialogs
 from aiogram_dialog.api.exceptions import OutdatedIntent, UnknownIntent
+from redis.asyncio import Redis
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+from admins import dialogs as admin_dialogs
 from config import StartStates, settings
 from db.models import User
 from middlewares import DbSessionMiddleware
-from redis.asyncio import Redis
 from routers import router
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from admins import dialogs as admin_dialogs
+
+
+engine = create_async_engine(settings.sqlite_async_dsn, echo=False)
 
 
 async def ui_error_handler(event: ErrorEvent, dialog_manager: DialogManager):
@@ -33,7 +37,6 @@ async def main():
         level=logging.INFO,
         format="%(asctime)s %(levelname)s %(message)s",
     )
-    engine = create_async_engine(settings.sqlite_async_dsn, echo=False)
     db_pool = async_sessionmaker(engine, expire_on_commit=False)
 
     bot = Bot(

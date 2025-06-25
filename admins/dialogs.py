@@ -6,7 +6,7 @@ from aiogram_dialog.widgets.text import Const, Format, Jinja
 
 from admins.getters import add_user_result_getter
 from admins.handlers import on_confirm_user, on_enter_name, on_role
-from admins.states import AddUserSG
+from admins.states import AddUserSG, MainSG
 from config import Roles
 
 CANCEL_EDIT = SwitchTo(
@@ -14,6 +14,16 @@ CANCEL_EDIT = SwitchTo(
     when=F["dialog_data"]["finished"],
     id="cnl_edt",
     state=AddUserSG.preview,
+)
+
+main_dialog = Dialog(
+    Window(
+        Button(Const("Новый заказ"), id="to_new_order"),
+        Button(Const("Заказы за смену"), "to_shift_orders"),
+        Button(Const("Рассчитать курьеров"), id="to_courier_calculation"),
+        Button(Const("Админка"), id="to_adminka"),
+        state=MainSG.main,
+    ),
 )
 
 add_user = Dialog(
@@ -51,9 +61,10 @@ add_user = Dialog(
             id="to_enter_name",
             state=AddUserSG.enter_name,
         ),
-        Button(Const('Подвердить'), id='confirm_user', on_click=on_confirm_user),
+        Button(Const("Подвердить"), id="confirm_user", on_click=on_confirm_user),
         Cancel(Const("Отмена")),
         state=AddUserSG.preview,
         getter=add_user_result_getter,
     ),
 )
+

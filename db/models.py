@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Annotated, List, Optional, Text
 
+from config import Payments, Roles
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-
 from sqlalchemy.orm.properties import ForeignKey
 
 
@@ -25,7 +26,7 @@ class User(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
-    role: Mapped[str]
+    role: Mapped[Roles] = mapped_column(SQLEnum(Roles, name="user_role"))
     orders: Mapped[List["Order"]] = relationship(back_populates="courier")
 
     def __repr__(self) -> str:
@@ -37,7 +38,7 @@ class Order(Base):
 
     id: Mapped[classic_id]
     dttm: Mapped[dttm]
-    payment: Mapped[str]
+    payment: Mapped[Payments] = mapped_column(SQLEnum(Payments, name="payment"))
     price: Mapped[Optional[int]]
     courier_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"))
     courier: Mapped["User"] = relationship(back_populates="orders")
@@ -53,6 +54,7 @@ class Location(Base):
 
     id: Mapped[classic_id]
     name: Mapped[str] = mapped_column(unique=True)
+    price: Mapped[int]
 
     def __repr__(self) -> str:
-        return f"Location(id={self.id!r}, name={self.name!r})"
+        return f"Location(id={self.id!r}, name={self.name!r}, price={self.price!r})"
