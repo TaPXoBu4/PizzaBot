@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
-
-from db.models import Location, Order, User
+from db.models import Base, User, Order, Location
 from pizzabot import engine
+
 
 # Инициализируем FastAPI и SQLAdmin
 app = FastAPI()
@@ -17,17 +17,15 @@ class UserAdmin(ModelView, model=User):
     name = "Пользователь"
     name_plural = "Пользователи"
     icon = "fa-solid fa-user"
-    can_export = False
 
 
 class OrderAdmin(ModelView, model=Order):
     column_list = [Order.id, Order.dttm, Order.price, Order.payment, Order.courier]
-    column_searchable_list = [Order.payment, Order.courier]
+    column_searchable_list = [Order.payment]
     column_filters = [Order.payment, Order.dttm, Order.price]
     name = "Заказ"
     name_plural = "Заказы"
     icon = "fa-solid fa-box"
-    can_export = False
 
 
 class LocationAdmin(ModelView, model=Location):
@@ -37,7 +35,6 @@ class LocationAdmin(ModelView, model=Location):
     name = "Локация"
     name_plural = "Локации"
     icon = "fa-solid fa-map-pin"
-    can_export = False
 
 
 # Регистрируем
