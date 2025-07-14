@@ -1,7 +1,7 @@
 from aiogram.fsm.state import State, StatesGroup
 
 
-class NewOrderSG(StatesGroup):
+class OrderSG(StatesGroup):
     location = State()
     address = State()
     price = State()

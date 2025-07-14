@@ -44,7 +44,7 @@ class Order(Base):
     courier_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"))
     courier: Mapped["User"] = relationship(back_populates="orders")
     location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("locations.id"))
-    info: Mapped[Optional[Text]]
+    address: Mapped[Optional[Text]]
 
     def __repr__(self) -> str:
         return f"Order(id={self.id!r}, dttm={self.dttm!r}, price={self.dttm!r}, payment={self.payment!r}, courier={self.courier.name!r})"

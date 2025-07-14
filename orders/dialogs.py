@@ -3,7 +3,7 @@ from aiogram_dialog import Dialog, Window
 from orders.states import NewOrderSG
 
 
-new_order = Dialog(
+order = Dialog(
     Window(state=NewOrderSG.location),
     Window(state=NewOrderSG.address),
     Window(state=NewOrderSG.price),
