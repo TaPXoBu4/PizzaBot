@@ -3,7 +3,6 @@ from sqladmin import Admin, ModelView
 from db.models import Base, User, Order, Location
 from pizzabot import engine
 
-
 # Инициализируем FastAPI и SQLAdmin
 app = FastAPI()
 admin = Admin(app, engine)

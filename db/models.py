@@ -4,7 +4,8 @@ from typing import Annotated, List, Optional, Text
 from config import Payments, Roles
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from sqlalchemy.orm.properties import ForeignKey
+
+from sqlalchemy.sql.schema import ForeignKey
 
 
 class Base(DeclarativeBase):
