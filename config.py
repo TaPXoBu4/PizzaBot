@@ -3,9 +3,6 @@ from enum import StrEnum
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from admins.states import MainSG as admin_mainsg
-from couriers.states import MainSG as courier_mainsg
-
 
 class Roles(StrEnum):
     ADMIN = "админ"
@@ -16,12 +13,6 @@ class Payments(StrEnum):
     CASH = "наличные"
     TERMINAL = "терминал"
     PAID = "оплачено"
-
-
-StartStates = {
-    Roles.ADMIN.value: admin_mainsg.main,
-    Roles.COURIER.value: courier_mainsg.main,
-}
 
 
 class Settings(BaseSettings):
@@ -43,6 +34,6 @@ class Settings(BaseSettings):
         env_nested_delimiter="__",
         extra="ignore",
     )
-
+    
 
 settings = Settings()

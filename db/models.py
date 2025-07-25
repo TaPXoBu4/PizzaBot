@@ -7,13 +7,8 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 from sqlalchemy.sql.schema import ForeignKey
 
-
-class Base(DeclarativeBase):
-    pass
-
-
 dttm = Annotated[datetime, mapped_column(default=datetime.now)]
-classic_id = Annotated[
+baseid = Annotated[
     int,
     mapped_column(
         primary_key=True,
@@ -21,6 +16,10 @@ classic_id = Annotated[
         nullable=False,
     ),
 ]
+
+
+class Base(DeclarativeBase):
+    id: Mapped[baseid]
 
 
 class User(Base):
@@ -37,25 +36,23 @@ class User(Base):
 class Order(Base):
     __tablename__ = "orders"
 
-    id: Mapped[classic_id]
     dttm: Mapped[dttm]
     payment: Mapped[Payments] = mapped_column(SQLEnum(Payments, name="payment"))
     price: Mapped[Optional[int]]
     courier_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"))
     courier: Mapped["User"] = relationship(back_populates="orders")
-    location_id: Mapped[Optional[int]] = mapped_column(ForeignKey("locations.id"))
+    area_id: Mapped[Optional[int]] = mapped_column(ForeignKey("areas.id"))
     address: Mapped[Optional[Text]]
 
     def __repr__(self) -> str:
         return f"Order(id={self.id!r}, dttm={self.dttm!r}, price={self.dttm!r}, payment={self.payment!r}, courier={self.courier.name!r})"
 
 
-class Location(Base):
-    __tablename__ = "locations"
+class Area(Base):
+    __tablename__ = "areas"
 
-    id: Mapped[classic_id]
     name: Mapped[str] = mapped_column(unique=True)
-    price: Mapped[int]
+    tariff: Mapped[int]
 
     def __repr__(self) -> str:
-        return f"Location(id={self.id!r}, name={self.name!r}, price={self.price!r})"
+        return f"Area(id={self.id!r}, name={self.name!r}, price={self.tariff!r})"

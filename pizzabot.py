@@ -10,15 +10,15 @@ from aiogram.types import ErrorEvent
 from aiogram_dialog import DialogManager, StartMode, setup_dialogs
 from aiogram_dialog.api.exceptions import OutdatedIntent, UnknownIntent
 from redis.asyncio import Redis
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from admins import dialogs as admin_dialogs
-from config import StartStates, settings
+from admins.states import MainSG as admin_mainsg
+from config import Roles, settings
+from couriers.states import MainSG as courier_mainsg
 from db.models import User
 from middlewares import DbSessionMiddleware
 from routers import router
-
 
 engine = create_async_engine(settings.sqlite_async_dsn, echo=False)
 
@@ -26,9 +26,9 @@ engine = create_async_engine(settings.sqlite_async_dsn, echo=False)
 async def ui_error_handler(event: ErrorEvent, dialog_manager: DialogManager):
     session: AsyncSession = dialog_manager.middleware_data["session"]
     userid = dialog_manager.middleware_data["event_from_user"].id
-    query = select(User).filter_by(id=userid)
-    user: User = await session.scalar(query)
-    await dialog_manager.start(state=StartStates[user.role], mode=StartMode.RESET_STACK)
+    user = await session.get(User, userid)
+    start_state = admin_mainsg.main if user.role == Roles.ADMIN else courier_mainsg.main
+    await dialog_manager.start(state=start_state, mode=StartMode.RESET_STACK)
     logging.warning("Сброс ошибки: {event}")
 
 
