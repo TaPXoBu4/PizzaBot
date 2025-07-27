@@ -21,19 +21,46 @@ baseid = Annotated[
 class Base(DeclarativeBase):
     id: Mapped[baseid]
 
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class User(Base):
+    """
+    Модель пользователя (например, курьера или администратора).
+
+    Атрибуты:
+        id (int): Уникальный идентификатор пользователя.
+        name (str): Имя пользователя (уникальное).
+        role (Roles): Роль пользователя в системе (например, COURIER, ADMIN).
+        orders (List[Order]): Список заказов, закрепленных за этим пользователем.
+    """
+
     __tablename__ = "users"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
     role: Mapped[Roles] = mapped_column(SQLEnum(Roles, name="user_role"))
-    orders: Mapped[List["Order"]] = relationship(back_populates="courier")
+    orders: Mapped[List["Order"]] = relationship(
+        back_populates="courier", lazy="dynamic"
+    )
 
     def __repr__(self) -> str:
         return f"User(id={self.id!r}, name={self.name!r}, role={self.role!r})"
 
 
 class Order(Base):
+    """Модель заказа.
+    Атрибуты:
+        id (int): Уникальный идентификатор заказа.
+        dttm (datetime): Дата и время создания заказа (по умолчанию — текущее).
+        payment (Payments): Тип оплаты (enum).
+        price (int | None): Стоимость заказа в рублях.
+        courier_id (int | None): ID курьера, связанного с заказом.
+        area_id (int | None): ID зоны доставки.
+        address (str | None): Адрес доставки.
+    """
+
     __tablename__ = "orders"
 
     dttm: Mapped[dttm]
@@ -45,7 +72,7 @@ class Order(Base):
     address: Mapped[Optional[Text]]
 
     def __repr__(self) -> str:
-        return f"Order(id={self.id!r}, dttm={self.dttm!r}, price={self.dttm!r}, payment={self.payment!r}, courier={self.courier.name!r})"
+        return f"Order(id={self.id!r}, dttm={self.dttm!r}, price={self.price!r}, payment={self.payment!r}, courier={self.courier_id!r})"
 
 
 class Area(Base):

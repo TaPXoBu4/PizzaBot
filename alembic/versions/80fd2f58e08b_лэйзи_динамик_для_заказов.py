@@ -1,8 +1,8 @@
-"""добавил енамы в модели
+"""лэйзи динамик для заказов
 
-Revision ID: 84000d4e9108
-Revises: 2197c8dfc733
-Create Date: 2025-06-23 21:44:32.019340
+Revision ID: 80fd2f58e08b
+Revises: cc3d0c537574
+Create Date: 2025-07-27 21:03:16.058809
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '84000d4e9108'
-down_revision: Union[str, None] = '2197c8dfc733'
+revision: str = '80fd2f58e08b'
+down_revision: Union[str, None] = 'cc3d0c537574'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

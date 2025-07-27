@@ -12,12 +12,14 @@ from aiogram_dialog.api.exceptions import OutdatedIntent, UnknownIntent
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from admins import dialogs as admin_dialogs
+from admins import dialogs as adm_dlgs
 from admins.states import MainSG as admin_mainsg
 from config import Roles, settings
+from couriers import dialogs as cou_dlgs
 from couriers.states import MainSG as courier_mainsg
 from db.models import User
 from middlewares import DbSessionMiddleware
+from orders import dialogs as o_dlgs
 from routers import router
 
 engine = create_async_engine(settings.sqlite_async_dsn, echo=False)
@@ -51,7 +53,13 @@ async def main():
         ),
     )
     dp = Dispatcher(storage=storage)
-    dp.include_routers(router, admin_dialogs.add_user)
+    dp.include_routers(
+        router,
+        adm_dlgs.add_user,
+        cou_dlgs.main_dialog,
+        o_dlgs.order,
+        o_dlgs.orders,
+    )
     setup_dialogs(dp)
     dp.update.outer_middleware(DbSessionMiddleware(db_pool))
     dp.errors.register(
